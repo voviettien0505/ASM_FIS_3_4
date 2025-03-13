@@ -32,11 +32,9 @@ public class OrderController {
         return orderService.getAllOrdersWithUser();
     }
 
-    // Cập nhật thành đã xác nhận trong admin
     @PutMapping("/{orderId}/confirm/admin")
-    public ResponseEntity<String> OrderConfirmed(@PathVariable String orderId) {
-        String responseMessage = orderService.OrderConfirmed(orderId);
-        return ResponseEntity.ok(responseMessage);
+    public ResponseEntity<String> confirmOrder(@PathVariable String orderId) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(orderId));
     }
 
 

@@ -21,6 +21,7 @@ class OrderService {
     async getOrdersByUserId(userId) {
         try {
             const response = await axios.get(`${BASE_URL}/user/${userId}`);
+          
             return response.data; // Danh sách đơn hàng
         } catch (error) {
             console.error("Lỗi khi lấy danh sách đơn hàng:", error);
@@ -33,9 +34,23 @@ class OrderService {
             const response = await axios.get(`${BASE_URL}/all/admin`, {
                 withCredentials: true, // Đảm bảo cookie/session được gửi đi nếu cần xác thực
             });
+            console.log(response.data);
             return response.data; // Danh sách tất cả đơn hàng
         } catch (error) {
             console.error("Lỗi khi lấy tất cả đơn hàng:", error);
+            throw error;
+        }
+    }
+
+    // Cập nhật trạng thái đơn hàng (admin)
+    async confirmOrder(orderId) {
+        try {
+            const response = await axios.put(`${BASE_URL}/${orderId}/confirm/admin`, null, {
+                withCredentials: true,
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Lỗi khi cập nhật trạng thái đơn hàng:", error);
             throw error;
         }
     }

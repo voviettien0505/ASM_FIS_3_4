@@ -10,6 +10,8 @@ import com.example.workflow.model.Product;
 import com.example.workflow.repository.*;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ public class OrderService {
     private CartRepository cartRepository;
     @Autowired
     private RuntimeService runtimeService;
+
 
     @Transactional
     public OrderResponseDTO createOrder(CreateOrderRequest request) {
@@ -146,30 +149,19 @@ public class OrderService {
         )).collect(Collectors.toList());
     }
 
-    @Transactional
-    public String OrderConfirmed(String orderId) {
-        String currentStatusRequired = "DA_DAT_HANG"; // Chỉ cho phép cập nhật nếu trạng thái hiện tại là DA_DAT_HANG
-        String newStatus = "DA_XAC_NHAN"; // Trạng thái sau khi cập nhật
 
-        // 🛠 Tìm đơn hàng
+
+    @Transactional
+    public String updateOrderStatus(String orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
-
-        //  Kiểm tra trạng thái hiện tại
-        if (!order.getStatus().equals(currentStatusRequired)) {
-            throw new IllegalStateException("Order can only be confirmed if it is in status: " + currentStatusRequired);
+        if (!"DA_DAT_HANG".equals(order.getStatus())) {
+            throw new IllegalStateException("Order must be in DA_DAT_HANG status to be confirmed");
         }
-
-        // ✅ Cập nhật trạng thái
-        order.setStatus(newStatus);
+        order.setStatus("DA_XAC_NHAN");
         orderRepository.save(order);
-
-        return "Order " + orderId + " has been confirmed successfully.";
+        return "Order " + orderId + " updated successfully";
     }
-
-
-
-
 
 
 }
